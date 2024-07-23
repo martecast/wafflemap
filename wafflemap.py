@@ -124,6 +124,8 @@ class Wafflemap:
             self.fig = ax.figure # parent figure of the passed ax
             
         self.ax.set_axis_off()
+        self.ax.tick_params(axis='both', which='both',
+                            length=0, width=0, labelsize=0)
         self.ax.axis('equal')
         self.ax.set_xlim([self.df.plotx.min(),
                           self.df.plotx.max() + self.width])
@@ -281,15 +283,61 @@ class Wafflemap:
                 self.reset_die(x,y)
         if what == 'figure' or what == 'all':
             self.ax.cla()
-
-    ### Labels
-    def label_die(self,x,y, label='coord', loc='center',  **text_kwargs):
-        if 'fontsize' not in text_kwargs:
-            text_kwargs['fontsize'] = self.height /0.8
+            
+    ######### Labels
+    def label_die(self,x,y, label='coord', loc='center', fontsize=None, **text_kwargs):
+        
+        assert loc in ['center', 'lower', 'upper', 'center left', 'lower left', 'upper left', 'center right', 'lower right', 'upper right'], "invalid loc"
+        
+        if fontsize == None:
+            fontsize = self.default_fontsize
+        
         if loc == 'center':
             px = self.get_plotx(x,y) + self.width/2
             py = self.get_ploty(x,y) + self.height/2
-        # in the future i could add more options to place the label within the die
+            horizintal_alignment = 'center'
+            vertical_alignment = 'center'
+        elif loc == 'lower':
+            px = self.get_plotx(x,y) + self.width/2
+            py = self.get_ploty(x,y) + self.height/20
+            horizintal_alignment = 'center'
+            vertical_alignment = 'bottom'
+        elif loc == 'upper':
+            px = self.get_plotx(x,y) + self.width/2
+            py = self.get_ploty(x,y) + self.height - self.height/20
+            horizintal_alignment = 'center'
+            vertical_alignment = 'top'
+        elif loc == 'center left':
+            px = self.get_plotx(x,y) + self.width/20
+            py = self.get_ploty(x,y) + self.height/2
+            horizintal_alignment = 'left'
+            vertical_alignment = 'center'
+        elif loc == 'lower left':
+            px = self.get_plotx(x,y) + self.width/20
+            py = self.get_ploty(x,y) + self.height/20
+            horizintal_alignment = 'left'
+            vertical_alignment = 'bottom'
+        elif loc == 'upper left':
+            px = self.get_plotx(x,y) + self.width/20
+            py = self.get_ploty(x,y) + self.height - self.height/20
+            horizintal_alignment = 'left'
+            vertical_alignment = 'top'
+        elif loc == 'center right':
+            px = self.get_plotx(x,y) + self.width - self.width/20
+            py = self.get_ploty(x,y) + self.height/2
+            horizintal_alignment = 'right'
+            vertical_alignment = 'center'
+        elif loc == 'lower right':
+            px = self.get_plotx(x,y) + self.width - self.width/20
+            py = self.get_ploty(x,y) + self.height/20
+            horizintal_alignment = 'right'
+            vertical_alignment = 'bottom'
+        elif loc == 'upper right':
+            px = self.get_plotx(x,y) + self.width - self.width/20
+            py = self.get_ploty(x,y) + self.height - self.height/20
+            horizintal_alignment = 'right'
+            vertical_alignment = 'top'
+            
         if label == 'coord':
             label_text = "{}.{}".format(x,y)
         #other default labels may be added
@@ -298,10 +346,12 @@ class Wafflemap:
             label_text = label
             
         self.ax.annotate(label_text, (px, py),
-                         ha='center', va='center',
+                         ha=horizintal_alignment,
+                         va=vertical_alignment,
+                         fontsize=fontsize,
                          **text_kwargs)
     
-    def label_all_dies(self, column = "", not_in_wafer=False, **text_kwargs):
+    def label_all_dies(self, column = "", not_in_wafer=False, fontsize=None, **text_kwargs):
 
         dies_to_label_list = self.df[self.df.in_wafer == True].xy.values
         
@@ -318,27 +368,14 @@ class Wafflemap:
             
             if column:
                 self.label_die(x,y, label=self.df[(self.df.x==x) & (self.df.y==y)][column].iloc[0],
-                               **text_kwargs)
+                               fontsize=fontsize,**text_kwargs)
             else:
-                self.label_die(x,y, label='coord', **text_kwargs)
-            
-    ###Save figure
-    def save_svg(self, filename = 'wafer_test'):
-        
-        path = r'C:\Users\martin.arteaga\Desktop'
-        file = filename + '.svg' if not filename.endswith(".svg") else filename
-        self.fig.savefig(os.path.join(path, file),format='svg')
-    
-    def save_png(self, filename = 'wafer_test'):
-        
-        path = r'C:\Users\martin.arteaga\Desktop'
-        file = filename + '.png' if not filename.endswith(".png") else filename
-        self.fig.savefig(os.path.join(path, file),format='png')
+                self.label_die(x,y, label='coord',fontsize=fontsize, **text_kwargs)
 
     ### Wafer
     def plot_wafer_outline(self, radius=None,
                            x_offset=0, y_offset=0,
-                           facecolor='none', edgecolor='black', linewidth=1.5,
+                           facecolor=None, edgecolor=None, linewidth=None,
                            notch=None, notch_type='f', notch_size=None):
         
         if radius == None:
@@ -458,6 +495,25 @@ class Wafflemap:
                                           linewidth=linewidth,
                                           zorder=-1)
         self.ax.add_patch(outline)
+        
+    ###Save figure
+    def save_svg(self, filename = 'wafer_test'):
+        
+        file = filename + '.svg' if not filename.endswith(".svg") else filename
+        if r'/' in filename or r'\\' in filename: 
+            self.fig.savefig(filename, format='svg')
+        else:
+            path = self.default_save_dir
+            self.fig.savefig(os.path.join(path, file),format='svg')
+    
+    def save_png(self, filename = 'wafer_test'):
+        
+        file = filename + '.png' if not filename.endswith(".png") else filename
+        if r'/' in filename or r'\\' in filename: 
+            self.fig.savefig(filename, format='png')
+        else:
+            path = self.default_save_dir
+            self.fig.savefig(os.path.join(path, file),format='png')
       
     ### Others
     def is_rgba_array(self, array):
@@ -492,3 +548,4 @@ if __name__ == "__main__":
     wm1.plot_dies()
     wm1.plot_wafer_outline()
     wm1.label_all_dies()
+    wm1.save_png()
