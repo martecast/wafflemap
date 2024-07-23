@@ -16,21 +16,44 @@ import matplotlib.path as mpath
 class Wafflemap:
     
     def __init__(self, x_range=[], y_range=[], die_list = [],
-                 width_over_height_ratio=1, v_flip=False, h_flip=False,
+                 die_aspect_ratio=1, v_flip=False, h_flip=False,
                  ax=None):
+        """
+        Constructor of the Wafflemap class
+        Parameters:
+            - x_range: interval of the x-coordinate of the dies (tuple of 2 integers)
+            - y_range: interval of the y-coordinate of the dies (tuple of 2 integers)
+            - die_list list of dies to be included in the wafer (list of 2-tuples)
+                (the dies fo the list must be within the given range,
+                 i.e.  for a die (x,y), x must be in x_range and y in y_range)
+            - die_aspect_ratio: aspect ratio of the dies
+            - v_flip: wether to flip the coordinate system of the dies along y
+            - h_flip: wether to flip the coordinate system of the dies along x
+            - ax: matplotlib.axes.Axes object (to be used only if you want multiple wafermaps in a single figure)
+        """
+        
+        self.height = 5
+        self.width = die_aspect_ratio * self.height
         
         # Default die parameters
         self.default_die_facecolor = 'gray'
         self.default_die_edgecolor = 'black'
         self.default_blank_die_color = 'none'
         self.default_die_line_width = 0.5
+        # Default wafer outline parameters
+        self.default_wafer_linewidth = 1.5
+        self.default_wafer_facecolor = 'none' # 'none' means transparent
+        self.default_wafer_edgecolor = 'black'
+        # Default label parameters
+        self.default_fontsize = self.height /1.05
         # Figure parameters
         fig_kwargs = {
-            'figsize' : (5,5),
+            'figsize' : (3,3),
             'dpi' : 200,
-            'facecolor' : None, # None -> "white" (plt default)
-            'edgecolor' : None, # None -> "white" (plt default)
+            'facecolor' : None, # None means "white" (plt default)
+            'edgecolor' : None, # None means "white" (plt default)
             }
+        self.default_save_dir = os.path.dirname(__file__)
         
         #######################################################################
         if x_range == []:
@@ -42,9 +65,6 @@ class Wafflemap:
         #######################################################################
         self.x_range = np.array(x_range)
         self.y_range = np.array(y_range)
-        
-        self.height = 5
-        self.width = width_over_height_ratio * self.height
         
         die_list_x_col = []
         die_list_y_col = []
@@ -336,6 +356,13 @@ class Wafflemap:
         
         self.ax.set_xlim([w_x0 - w_rad - 0.5, w_x0 + w_rad + 0.5])
         self.ax.set_ylim([w_y0 - w_rad - 0.5, w_y0 + w_rad + 0.5])
+        
+        if linewidth == None:
+            linewidth = self.default_wafer_linewidth
+        if facecolor == None:
+            facecolor = self.default_wafer_facecolor
+        if edgecolor == None:
+            edgecolor = self.default_wafer_edgecolor
         
         if notch:
             assert notch in ['N','S','E','W'], "notch must be either 'N', 'S', 'E' or 'W'"
