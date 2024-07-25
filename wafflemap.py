@@ -263,13 +263,6 @@ class Wafflemap:
     
         if imshow:
             self.fig.show()
-
-        
-    def rescale_fig(self, margin=6):
-        self.ax.set_xlim([self.df.plotx.min() - margin,
-                          self.df.plotx.max() + self.width + margin])
-        self.ax.set_ylim([self.df.ploty.min() - margin,
-                          self.df.ploty.max() + self.height + margin])
         
     def reset_die(self,x,y):
         self.set_color(x,y,self.default_die_facecolor)
