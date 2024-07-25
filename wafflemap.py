@@ -341,7 +341,8 @@ class Wafflemap:
         if label == 'coord':
             label_text = "{}.{}".format(x,y)
         #other default labels may be added
-        #elif label == ...
+        elif label in self.df.columns:
+            label_text = str(self.get_value(x, y, label))
         else:
             label_text = label
             
