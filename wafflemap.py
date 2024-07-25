@@ -29,7 +29,8 @@ class Wafflemap:
             - die_aspect_ratio: aspect ratio of the dies
             - v_flip: wether to flip the coordinate system of the dies along y
             - h_flip: wether to flip the coordinate system of the dies along x
-            - ax: matplotlib.axes.Axes object (to be used only if you want multiple wafermaps in a single figure)
+            - ax: matplotlib.axes.Axes object (to be used only if you want 
+            multiple wafermaps in a single figure)
         """
         
         self.height = 5
@@ -137,21 +138,34 @@ class Wafflemap:
 ##############################################################################  
 
     def add_die(self,x,y):
+        """
+        Add given die to te list of dies considered as part of the wafer
+        """
         index = self.df.loc[(self.df.x==x)&(self.df.y==y)].index
         self.df.loc[index, 'in_wafer']=True
         self.set_color(x,y, self.default_die_facecolor)
         self.set_edgecolor(x, y, self.default_die_edgecolor)
         
     def add_die_list(self,die_list):
+        """Add multiple dies by passing a list"""
         for die in die_list:
             self.add_die(*die)
     
     def remove_die(self,x,y):
+        """
+        Remove given die to te list of dies considered as part of the wafer.
+        Also reset it's color and hatch to the 'blank die' format
+        """
         index = self.df.loc[(self.df.x==x)&(self.df.y==y)].index
         self.df.loc[index, 'in_wafer']=False
         self.set_color(x, y, self.default_blank_die_color)
         self.set_edgecolor(x, y, self.default_blank_die_color)
         self.set_hatch(x, y, '')
+    
+    def remove_die_list(self, die_list):
+        """Remove multiple dies by passing a list"""
+        for die in die_list:
+            self.remove_die(*die)
     
     def dies_in_radius(self, radius_in_number_of_dies=0):
         die_list = []
@@ -279,6 +293,13 @@ class Wafflemap:
             
     ######### Labels
     def label_die(self,x,y, label='coord', loc='center', fontsize=None, **text_kwargs):
+        """
+        Print label on specific die. By default prints the die coordinate.
+        - label: string with the label to be printed on the label
+        - loc: position of the text within the die
+        - fontsize: size of the font :P
+        - text_kwargs: other key-word arguments that can be passed to plt.annotate()
+        """
         
         assert loc in ['center', 'lower', 'upper', 'center left', 'lower left', 'upper left', 'center right', 'lower right', 'upper right'], "invalid loc"
         
@@ -346,7 +367,15 @@ class Wafflemap:
                          **text_kwargs)
     
     def label_all_dies(self, column = "", not_in_wafer=False, fontsize=None, **text_kwargs):
-
+        """
+        Print label on each die. By default prints the die coordinate, but it
+        can print any value stored in the DataFrame attribute.
+        - column: name of the DataFrame column whose values will be printed
+        - not_in_wafer: wether to label the dies that are not added to the wafermap
+        - fontsize: size of the font :P
+        - text_kwargs: other key-word arguments that can be passed to plt.annotate()
+        """
+        
         dies_to_label_list = self.df[self.df.in_wafer == True].xy.values
         
         assert len(dies_to_label_list) > 0, "No dies in wafer to label, to add a die use self.add_die(x,y)"
@@ -371,6 +400,24 @@ class Wafflemap:
                            x_offset=0, y_offset=0,
                            facecolor=None, edgecolor=None, linewidth=None,
                            notch=None, notch_type='f', notch_size=None):
+        """
+        Plot a circular outline around the dies.
+        - radius: Radius of outline. If None, a radius is calculated based on 
+                  die numbers
+        - x_offset: displace the center of the outline horizontally
+        - y_offset: displace the center of the outline vertically
+        - facecolor: background color of the wafer. Transparent by default
+        - edgecolor: color of the edge. Black by default
+        - linewidth: 
+        - notch: Wether to include a notch on the outline and on which side to 
+                 place it. By default no notch is added. To add a notch pass
+                 'N', 'S', 'E', 'W' to indicate on which side the notch should be
+        - notch_type: 'c' for circular notch
+                      'e' for elliptic notch
+                      'f' for flat cut notch
+        - notch_size: size of the notch. Default value is around 3
+        """
+        
         
         if radius == None:
             temp = np.max([(self.x_range.max()-self.x_range.min()+1)/2,
