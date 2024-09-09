@@ -1,10 +1,3 @@
----
-attachments: [add_remove_wm.png, diff_ranges_wm.png, wafer_test.png, wafer_test2.png]
-title: Wafflemap
-created: '2024-07-22T10:32:53.546Z'
-modified: '2024-07-25T15:23:14.655Z'
----
-
 # Wafflemap
 
 Wafflemap is a simple Python module that helps you draw wafermaps. It covers simple functions like creating a wafermap with arbitrary shape and die count, coloring dies and labeling them.
