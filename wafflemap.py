@@ -589,4 +589,4 @@ if __name__ == "__main__":
     wm1.plot_dies()
     wm1.plot_wafer_outline()
     wm1.label_all_dies()
-    wm1.save_png()
+    plt.show()
