@@ -95,9 +95,25 @@ class Wafer:
 
 class Wafflemap:
 
-    def __init__(self, config_file= None, die_df_file = None, label_df_file= None,
-                 die_list=[]):
+    def __init__(self, xmin=None,xmax=None, ymin=None, ymax=None, die_list = None,
+                 die_aspect_ratio=1, v_flip=False, h_flip=False,
+                 ax=None):
+        """
+        Constructor of the Wafflemap class
+        Parameters:
+            - xmin, xmax: interval of the x-coordinate of the dies (tuple of 2 integers)
+            - ymin, ymax: interval of the y-coordinate of the dies (tuple of 2 integers)
+            - die_list list of dies to be included in the wafer (list of 2-tuples)
+                (the dies fo the list must be within the given range,
+                 i.e.  for a die (x,y), x must be in x_range and y in y_range)
+            - die_aspect_ratio: aspect ratio of the dies
+            - v_flip: wether to flip the coordinate system of the dies along y
+            - h_flip: wether to flip the coordinate system of the dies along x
+            - ax: matplotlib.axes.Axes object (to be used only if you want 
+            multiple wafermaps in a single figure)
+        """
         ### TODO make the init with X range and Y range come back
+        ### TODO propagate the current init signature to the rest of the file
         self.v_flip = False
         self.h_flip = False # put these two in the config file
         
