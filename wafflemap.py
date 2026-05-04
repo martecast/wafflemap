@@ -67,7 +67,7 @@ default_config_dict = {
     },
     
     "grid":{
-        "enable":True,
+        "enable":False,
         "color":"gray",
         "alpha":0.5,
         "linewidth":0.5
@@ -78,6 +78,9 @@ default_config_dict = {
         "rotation": 0 # 0, 90, 180
         }
 }
+
+def coord_label_format(x,y):
+    return f"X{x}Y{y}"
 
 ######################################################################################
 ######################################################################################
@@ -95,8 +98,9 @@ class Wafer:
 
 class Wafflemap:
 
-    def __init__(self, xmin=None,xmax=None, ymin=None, ymax=None, die_list = None,
-                 die_aspect_ratio=1, v_flip=False, h_flip=False,
+    def __init__(self, xmin=None,xmax=None, ymin=None, ymax=None, die_list = [],
+                 die_aspect_ratio=1, v_flip=False, h_flip=False, config_file= None,
+                 die_df_file= None, label_df_file=None,
                  ax=None):
         """
         Constructor of the Wafflemap class
@@ -119,7 +123,6 @@ class Wafflemap:
         
         
         self.config : dict = self.parse_config(config_file=config_file)
-        
         self.die_config = self.config["dies"] 
         self.die_config["width"] = self.die_config["height"]*self.die_config["aspect_ratio"]
         
@@ -596,7 +599,7 @@ class Wafflemap:
                 vertical_alignment = 'top'
                 
             if label == 'COORD':
-                label_text = "{}.{}".format(x,y)
+                label_text = coord_label_format(x,y)
             #other default labels may be added
             elif label == 'CHECK':
                 self.check_die(x=x,y=y,loc=loc,color=fontcolor,size=fontsize)

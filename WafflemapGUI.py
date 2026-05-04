@@ -460,7 +460,7 @@ class WafflemapGUI(Wafflemap):
         root.bind('<Button-1>', lambda c: self.left_click_edit_die(c.x,c.y))
         root.bind('<Button-2>', lambda c: self.right_click_edit_die(c.x,c.y))
         root.bind('<Button-3>', lambda c: self.right_click_edit_die(c.x,c.y))
-        self.fig_frame.bind('<Button-1>', lambda c: self.edit_die(c.x,c.y))
+        self.fig_frame.bind('<Button-1>', lambda c: self.left_click_edit_die(c.x,c.y))
 
 # END INIT
 ##############################################################################################################
